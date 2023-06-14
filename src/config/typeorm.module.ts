@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   imports: [
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
         host: configService.get('TYPEORM_HOST'),
@@ -13,9 +14,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         username: configService.get('MYSQL_USER'),
         password: configService.get('MYSQL_ROOT_PASSWORD'),
         database: configService.get('MYSQL_DATABASE'),
-        entities: [],
+        migrationsTableName: 'migration',
       }),
-      inject: [ConfigService],
     }),
   ],
 })
