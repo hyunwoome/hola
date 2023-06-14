@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 
 config();
 
-export const typeORMConfig = new DataSource({
+export const dataSource = new DataSource({
   type: 'mysql',
   host: process.env.MYSQL_HOST,
   port: +process.env.MYSQL_PORT,
