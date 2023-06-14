@@ -1,28 +1,6 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { JoinColumn } from 'typeorm/browser';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
-export class Account {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @OneToOne(() => AccountProfile)
-  @JoinColumn()
-  accountProfileId: number;
-
-  @Column({ length: 50, nullable: false })
-  email: string;
-
-  @Column({ length: 20, nullable: false })
-  loginType: string;
-
-  @Column({ type: 'timestamp', nullable: false })
-  createDate: Date;
-
-  @Column({ type: 'timestamp', nullable: true })
-  deleteDate: Date;
-}
-
+@Entity('account_profile')
 export class AccountProfile {
   @PrimaryGeneratedColumn()
   id: number;
