@@ -5,9 +5,10 @@ import { AppService } from './app.service';
 // import configuration from './config/configuration';
 // import { TypeOrmModule } from '@nestjs/typeorm';
 import { SettingsModule } from './config/settings.module';
+import { AccountModule } from './modules/account/account.module';
 
 @Module({
-  imports: [SettingsModule],
+  imports: [SettingsModule, AccountModule],
   controllers: [AppController],
   providers: [AppService],
 })
