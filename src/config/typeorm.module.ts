@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Account } from '../entities/account.entity';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         username: configService.get('MYSQL_USER'),
         password: configService.get('MYSQL_ROOT_PASSWORD'),
         database: configService.get('MYSQL_DATABASE'),
-        migrationsTableName: 'migration',
+        migrationsTableName: 'migrations',
+        entities: [Account],
       }),
     }),
   ],

@@ -11,6 +11,6 @@ export const dataSource = new DataSource({
   username: process.env.MYSQL_USER,
   password: process.env.MYSQL_ROOT_PASSWORD,
   database: process.env.MYSQL_DATABASE,
-  migrations: ['./src/migration/*.ts'],
+  migrations: ['./src/migrations/*.ts'],
   migrationsTableName: 'migrations',
 });
