@@ -19,6 +19,9 @@ export class account {
   @Column({ length: 50, nullable: false })
   email: string;
 
+  @Column({ length: 100, nullable: true })
+  password: string;
+
   @Column({ length: 20, nullable: false })
   login_type: string;
 
