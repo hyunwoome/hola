@@ -4,9 +4,4 @@ import { AccountService } from './account.service';
 @Controller('api/account')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
-
-  @Get()
-  getHello() {
-    return this.accountService.getAccounts();
-  }
 }

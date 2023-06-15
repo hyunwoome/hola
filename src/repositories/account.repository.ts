@@ -12,7 +12,11 @@ export class AccountRepository extends Repository<account> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  getAccounts() {
-    return this.find();
+  async isEmailExist(email: string) {
+    return await this.createQueryBuilder('account')
+      .where('account.email = :email', {
+        email,
+      })
+      .getOne();
   }
 }

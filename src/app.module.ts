@@ -9,6 +9,7 @@ import { account } from './entities/account.entity';
 import { account_profile } from './entities/account-profile.entity';
 import { AccountModule } from './modules/account/account.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
       entities: [account, account_profile],
       namingStrategy: new SnakeNamingStrategy(),
     }),
+    AuthModule,
     AccountModule,
   ],
   controllers: [AppController],
