@@ -5,26 +5,26 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { AccountProfile } from './account-profile.entity';
+import { account_profile } from './account-profile.entity';
 
 @Entity('account')
-export class Account {
+export class account {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => AccountProfile)
-  @JoinColumn()
-  accountProfileId: number;
+  @OneToOne(() => account_profile)
+  @JoinColumn({ name: 'account_profile_id' })
+  account_profile_id: number;
 
   @Column({ length: 50, nullable: false })
   email: string;
 
   @Column({ length: 20, nullable: false })
-  loginType: string;
+  login_type: string;
 
   @Column({ type: 'timestamp', nullable: false })
-  createDate: Date;
+  create_date: Date;
 
   @Column({ type: 'timestamp', nullable: true })
-  deleteDate: Date;
+  delete_date: Date;
 }

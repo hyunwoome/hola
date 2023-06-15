@@ -1,18 +1,18 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('account_profile')
-export class AccountProfile {
+export class account_profile {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ length: 10, nullable: false })
-  accountType: string;
+  account_type: string;
 
   @Column({ length: 30, nullable: false })
   nickname: string;
 
   @Column({ length: 50, nullable: false })
-  customEmail: string;
+  custom_email: string;
 
   @Column({ length: 300, nullable: true })
   language: string;
@@ -24,20 +24,20 @@ export class AccountProfile {
   affiliation: string;
 
   @Column({ length: 200, nullable: true })
-  githubUrl: string;
+  github_url: string;
 
   @Column({ length: 200, nullable: true })
-  blogUrl: string;
+  blog_url: string;
 
   @Column({ type: 'text', nullable: true })
-  aboutMe: string;
+  about_me: string;
 
   @Column({ type: 'timestamp', nullable: false })
-  createDate: Date;
+  create_date: Date;
 
   @Column({ type: 'timestamp', nullable: true })
-  updateDate: Date;
+  update_date: Date;
 
   @Column({ type: 'timestamp', nullable: true })
-  deleteDate: Date;
+  delete_date: Date;
 }
