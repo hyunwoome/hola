@@ -17,6 +17,10 @@ export class AccountRepository extends Repository<account> {
       .where('account.email = :email', {
         email,
       })
-      .getOne();
+      .getExists();
+  }
+
+  async createAccountProfile() {
+    return await this.createQueryBuilder('account_');
   }
 }
