@@ -23,6 +23,7 @@ import { AuthModule } from './modules/auth/auth.module';
       database: process.env.MYSQL_DATABASE,
       entities: [account, account_profile],
       namingStrategy: new SnakeNamingStrategy(),
+      logging: true,
     }),
     AuthModule,
     AccountModule,
