@@ -1,9 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AccountRepository } from '../../repositories/account.repository';
-import { CreateAuthDto } from '../../dtos/auth/create-auth.dto';
+import { SignupAuthReqDto } from '../../dtos/auth/signup-auth-req.dto';
 import { DataSource } from 'typeorm';
 import { AccountProfileRepository } from '../../repositories/account-profile.repository';
 import * as bcrypt from 'bcryptjs';
+import { SigninAuthReqDto } from '../../dtos/auth/signin-auth-req.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -11,34 +13,60 @@ export class AuthService {
     private readonly accountRepository: AccountRepository,
     private readonly accountProfileRepository: AccountProfileRepository,
     private readonly dataSource: DataSource,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async signUp(createAuthDto: CreateAuthDto) {
-    const { email, password } = createAuthDto;
+  async signup(signupAuthReqDto: SignupAuthReqDto) {
+    const { email, password } = signupAuthReqDto;
     if (await this.accountRepository.isEmailExist(email)) {
       throw new HttpException('이미 등록된 이메일입니다.', HttpStatus.CONFLICT);
     }
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = password ? await bcrypt.hash(password, salt) : null;
-    console.log(hashedPassword);
+
+    let hashedPassword: '';
+    if (password) {
+      const salt = await bcrypt.genSalt();
+      hashedPassword = await bcrypt.hash(password, salt);
+    }
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const accountProfileId =
-        await this.accountProfileRepository.createAccountProfile(createAuthDto);
-      console.log(accountProfileId);
-      // await this.accountRepository.createAccount(
-      //   accountProfileId,
-      //   email,
-      //   hashedPassword,
-      // );
+      const createAccountProfileResult =
+        await this.accountProfileRepository.createAccountProfile(
+          signupAuthReqDto,
+        );
+      await this.accountRepository.createAccount(
+        createAccountProfileResult.identifiers[0]['id'],
+        email,
+        hashedPassword,
+        'email',
+      );
       await queryRunner.commitTransaction();
     } catch (err) {
+      console.error(err);
       await queryRunner.rollbackTransaction();
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async signin(signinAuthReqDto: SigninAuthReqDto) {
+    const { email, password } = signinAuthReqDto;
+    if (!(await this.accountRepository.isEmailExist(email))) {
+      throw new HttpException(
+        '회원가입을 먼저 진행해주세요.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    const existAccount = await this.accountRepository.getPassword(email);
+    const match = await bcrypt.compare(password, existAccount.password);
+    if (!match) {
+      throw new HttpException('비밀번호가 다릅니다.', HttpStatus.BAD_REQUEST);
+    }
+    const payload = { id: existAccount.id, email: existAccount.email };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }
