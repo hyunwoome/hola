@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { account_profile } from '../entities/account-profile.entity';
-import { SignupAuthReqDto } from '../dtos/auth/signup-auth-req.dto';
+import { SignupReqDto } from '../dtos/auth/signup.req.dto';
 
 @Injectable()
 export class AccountProfileRepository extends Repository<account_profile> {
@@ -13,7 +13,7 @@ export class AccountProfileRepository extends Repository<account_profile> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  async createAccountProfile(createAuthDto: SignupAuthReqDto) {
+  async createAccountProfile(createAuthDto: SignupReqDto) {
     const {
       email,
       nickname,
