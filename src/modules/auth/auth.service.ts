@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AccountRepository } from '../../repositories/account.repository';
-import { SignupAuthReqDto } from '../../dtos/auth/signup-auth-req.dto';
+import { SignupReqDto } from '../../dtos/auth/signup.req.dto';
 import { DataSource } from 'typeorm';
 import { AccountProfileRepository } from '../../repositories/account-profile.repository';
 import * as bcrypt from 'bcryptjs';
-import { SigninAuthReqDto } from '../../dtos/auth/signin-auth-req.dto';
+import { SigninReqDto } from '../../dtos/auth/signin.req.dto';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signup(signupAuthReqDto: SignupAuthReqDto) {
+  async signup(signupAuthReqDto: SignupReqDto) {
     const { email, password } = signupAuthReqDto;
     if (await this.accountRepository.isEmailExist(email)) {
       throw new HttpException('이미 등록된 이메일입니다.', HttpStatus.CONFLICT);
@@ -51,15 +51,16 @@ export class AuthService {
     }
   }
 
-  async signin(signinAuthReqDto: SigninAuthReqDto) {
+  async signin(signinAuthReqDto: SigninReqDto) {
     const { email, password } = signinAuthReqDto;
-    if (!(await this.accountRepository.isEmailExist(email))) {
-      throw new HttpException(
-        '회원가입을 먼저 진행해주세요.',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-    const existAccount = await this.accountRepository.getPassword(email);
+    console.log(await this.accountRepository.isEmailExists(email));
+    // if (!(await this.accountRepository.isEmailExist(email))) {
+    //   throw new HttpException(
+    //     '회원가입을 먼저 진행해주세요.',
+    //     HttpStatus.UNAUTHORIZED,
+    //   );
+    // }
+    const existAccount = await this.accountRepository.getPasswordByEmail(email);
     const match = await bcrypt.compare(password, existAccount.password);
     if (!match) {
       throw new HttpException('비밀번호가 다릅니다.', HttpStatus.BAD_REQUEST);

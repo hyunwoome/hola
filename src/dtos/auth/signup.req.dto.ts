@@ -23,7 +23,7 @@ enum Affiliation {
   Experienced = '현직자',
 }
 
-export class SignupAuthReqDto {
+export class SignupReqDto {
   // account
   @IsString()
   @IsNotEmpty()
