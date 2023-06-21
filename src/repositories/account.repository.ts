@@ -1,4 +1,4 @@
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { account } from '../entities/account.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,7 +8,6 @@ export class AccountRepository extends Repository<account> {
   constructor(
     @InjectRepository(account)
     private readonly repository: Repository<account>,
-    private readonly dataSource: DataSource,
   ) {
     super(repository.target, repository.manager, repository.queryRunner);
   }
@@ -44,22 +43,16 @@ export class AccountRepository extends Repository<account> {
         'account_profile.blog_url',
         'account_profile.about_me',
       ])
-      .where('account.id = :id', {
+      .where('account_profile.id = :id', {
         id: accountId,
       })
       .getOne();
   }
 
-  async createAccount(
-    accountProfileId: number,
-    email: string,
-    password: string,
-    loginType: string,
-  ) {
+  async createAccount(email: string, password: string, loginType: string) {
     return this.createQueryBuilder('account')
       .insert()
       .values({
-        account_profile: accountProfileId,
         email: email,
         password: password,
         login_type: loginType,

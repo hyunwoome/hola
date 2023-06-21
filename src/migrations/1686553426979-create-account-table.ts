@@ -6,7 +6,7 @@ export class CreateAccountTable1686553426979 implements MigrationInterface {
         CREATE TABLE account
         (
             id                 INTEGER AUTO_INCREMENT PRIMARY KEY,
-            account_profile_id INTEGER,
+            account_profile_id INTEGER NULL,
             email              VARCHAR(50)  NOT NULL UNIQUE,
             password           VARCHAR(100) NULL,
             login_type         VARCHAR(20)  NOT NULL,

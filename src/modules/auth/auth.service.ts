@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AccountRepository } from '../../repositories/account.repository';
-import { SignupDto } from '../../dtos/auth/signup.dto';
+import { EmailSignupDto } from '../../dtos/auth/email-signup.dto';
 import { DataSource } from 'typeorm';
 import { AccountProfileRepository } from '../../repositories/account-profile.repository';
 import * as bcrypt from 'bcryptjs';
-import { SigninDto } from '../../dtos/auth/signin.dto';
+import { EmailLoginDto } from '../../dtos/auth/email-login.dto';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -16,43 +16,27 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signup(signupAuthReqDto: SignupDto) {
-    const { email, password } = signupAuthReqDto;
+  async emailSignup(emailSignupDto: EmailSignupDto) {
+    const { email, password, loginType } = emailSignupDto;
     if (await this.accountRepository.isEmailExist(email)) {
       throw new HttpException('이미 등록된 이메일입니다.', HttpStatus.CONFLICT);
     }
 
-    let hashedPassword: '';
+    let hashedPassword: null;
     if (password) {
       const salt = await bcrypt.genSalt();
       hashedPassword = await bcrypt.hash(password, salt);
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      const createAccountProfileResult =
-        await this.accountProfileRepository.createAccountProfile(
-          signupAuthReqDto,
-        );
-      await this.accountRepository.createAccount(
-        createAccountProfileResult.identifiers[0]['id'],
-        email,
-        hashedPassword,
-        'email',
-      );
-      await queryRunner.commitTransaction();
-    } catch (err) {
-      console.error(err);
-      await queryRunner.rollbackTransaction();
-    } finally {
-      await queryRunner.release();
-    }
+    await this.accountRepository.createAccount(
+      email,
+      hashedPassword,
+      loginType,
+    );
   }
 
-  async signin(signinAuthReqDto: SigninDto) {
-    const { email, password } = signinAuthReqDto;
+  async emailLogin(emailLoginDto: EmailLoginDto) {
+    const { email, password } = emailLoginDto;
     if (!(await this.accountRepository.isEmailExist(email))) {
       throw new HttpException(
         '회원가입을 먼저 진행해주세요.',
@@ -68,5 +52,11 @@ export class AuthService {
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
+  }
+
+  // TODO: 1. emailSignupDto 이름 바꾸기 (OAuth 들도 다 써야하므로 범용적으로)
+  // TODO: 2. 구글 로그인할 때, 회원가입도 잘 되는지 테스트하기
+  async googleLogin(emailSignupDto: EmailSignupDto) {
+    return await this.emailSignup(emailSignupDto);
   }
 }

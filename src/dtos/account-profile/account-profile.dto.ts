@@ -1,11 +1,10 @@
 import {
-  IsNotEmpty,
-  IsEmail,
   IsString,
-  Length,
   IsUrl,
   IsOptional,
   IsEnum,
+  IsNotEmpty,
+  IsEmail,
 } from 'class-validator';
 
 enum Position {
@@ -23,15 +22,15 @@ enum Affiliation {
   Experienced = '현직자',
 }
 
-export class SignupDto {
+export class AccountProfileDto {
   @IsString()
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
   @IsString()
-  @Length(5)
-  password: string;
+  @IsNotEmpty()
+  account_type: string;
 
   @IsString()
   @IsOptional()
