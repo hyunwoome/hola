@@ -13,12 +13,6 @@ export class AccountRepository extends Repository<account> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  async isEmailExists(email: string) {
-    return await this.dataSource.manager.findOneBy(account, {
-      email,
-    });
-  }
-
   async isEmailExist(email: string) {
     return await this.createQueryBuilder('account')
       .where('account.email = :email', {
@@ -36,7 +30,7 @@ export class AccountRepository extends Repository<account> {
 
   async getAccountById(accountId: number) {
     return this.createQueryBuilder('account')
-      .innerJoin('account.account_profile_id', 'account_profile')
+      .innerJoin('account.account_profile', 'account_profile')
       .select([
         'account.id',
         'account.email',
@@ -65,7 +59,7 @@ export class AccountRepository extends Repository<account> {
     return this.createQueryBuilder('account')
       .insert()
       .values({
-        account_profile_id: accountProfileId,
+        account_profile: accountProfileId,
         email: email,
         password: password,
         login_type: loginType,

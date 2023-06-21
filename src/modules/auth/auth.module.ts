@@ -7,18 +7,22 @@ import { AuthController } from './auth.controller';
 import { AccountRepository } from '../../repositories/account.repository';
 import { AccountProfileRepository } from '../../repositories/account-profile.repository';
 import { JwtModule } from '@nestjs/jwt';
-import * as process from 'process';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { AccountService } from '../account/account.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
     TypeOrmModule.forFeature([account, account_profile]),
-    JwtModule.register({
-      global: true,
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '10s' },
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          secret: configService.get<string>('JWT_SECRET'),
+          signOptions: {
+            expiresIn: configService.get<string>('JWT_EXPIRATION_TIME'),
+          },
+        };
+      },
     }),
   ],
   controllers: [AuthController],
