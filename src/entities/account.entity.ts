@@ -14,7 +14,7 @@ export class account {
 
   @OneToOne(() => account_profile)
   @JoinColumn({ name: 'account_profile_id' })
-  account_profile_id: number;
+  account_profile: number;
 
   @Column({ length: 50, nullable: false })
   email: string;
