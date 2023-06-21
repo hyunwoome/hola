@@ -1,16 +1,26 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignupDto } from '../../dtos/auth/signup.dto';
+import { EmailSignupDto } from '../../dtos/auth/email-signup.dto';
 import { ApiResponse } from '../../utils/response.context';
-import { SigninDto } from '../../dtos/auth/signin.dto';
+import { EmailLoginDto } from '../../dtos/auth/email-login.dto';
+import { GoogleOAuthGuard } from '../../guards/google-oauth.guard';
+import { GoogleLoginDto } from '../../dtos/auth/google-login.dto';
 
 @Controller('api/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('signup')
-  async signup(@Body() signupAuthReqDto: SignupDto) {
-    await this.authService.signup(signupAuthReqDto);
+  @Post('email-signup')
+  async emailSignup(@Body() emailSignupDto: EmailSignupDto) {
+    await this.authService.emailSignup(emailSignupDto);
     return new ApiResponse({
       status: HttpStatus.NO_CONTENT,
       message: '회원가입에 성공하였습니다.',
@@ -18,12 +28,28 @@ export class AuthController {
     });
   }
 
-  @Post('signin')
-  async signin(@Body() signInAuthReqDto: SigninDto) {
+  @Post('email-login')
+  async emailLogin(@Body() signInAuthReqDto: EmailLoginDto) {
     return new ApiResponse({
       status: HttpStatus.NO_CONTENT,
-      message: '로그인에 성공하였습니다.',
-      data: await this.authService.signin(signInAuthReqDto),
+      message: '이메일 로그인에 성공하였습니다.',
+      data: await this.authService.emailLogin(signInAuthReqDto),
+    });
+  }
+
+  @Get('google-login')
+  @UseGuards(GoogleOAuthGuard)
+  async googleLogin() {
+    return null;
+  }
+
+  @Get('google-redirect')
+  @UseGuards(GoogleOAuthGuard)
+  async googleLoginRedirect(@Req() emailSignupDto: EmailSignupDto) {
+    return new ApiResponse({
+      status: HttpStatus.OK,
+      message: '구글 로그인에 성공하였습니다.',
+      data: await this.authService.googleLogin(emailSignupDto),
     });
   }
 }

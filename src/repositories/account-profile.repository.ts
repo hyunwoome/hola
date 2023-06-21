@@ -2,7 +2,8 @@ import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { account_profile } from '../entities/account-profile.entity';
-import { SignupDto } from '../dtos/auth/signup.dto';
+import { EmailSignupDto } from '../dtos/auth/email-signup.dto';
+import { AccountProfileDto } from '../dtos/account-profile/account-profile.dto';
 
 @Injectable()
 export class AccountProfileRepository extends Repository<account_profile> {
@@ -13,9 +14,10 @@ export class AccountProfileRepository extends Repository<account_profile> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  async createAccountProfile(createAuthDto: SignupDto) {
+  async createAccountProfile(accountProfileDto: AccountProfileDto) {
     const {
       email,
+      account_type,
       nickname,
       language,
       position,
@@ -23,11 +25,11 @@ export class AccountProfileRepository extends Repository<account_profile> {
       githubUrl,
       blogUrl,
       aboutMe,
-    } = createAuthDto;
+    } = accountProfileDto;
     return this.createQueryBuilder('account_profile')
       .insert()
       .values({
-        account_type: '일반',
+        account_type: account_type,
         custom_email: email,
         nickname: nickname,
         language: language,
