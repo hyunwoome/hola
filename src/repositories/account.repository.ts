@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { account } from '../entities/account.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AccountDto } from '../dtos/account-profile/account.dto';
 
 @Injectable()
 export class AccountRepository extends Repository<account> {
@@ -49,7 +50,8 @@ export class AccountRepository extends Repository<account> {
       .getOne();
   }
 
-  async createAccount(email: string, password: string, loginType: string) {
+  async createAccount(accountDto: AccountDto) {
+    const { email, password, loginType } = accountDto;
     return this.createQueryBuilder('account')
       .insert()
       .values({

@@ -8,19 +8,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { EmailSignupDto } from '../../dtos/auth/email-signup.dto';
+import { AccountDto } from '../../dtos/account-profile/account.dto';
 import { ApiResponse } from '../../utils/response.context';
 import { EmailLoginDto } from '../../dtos/auth/email-login.dto';
 import { GoogleOAuthGuard } from '../../guards/google-oauth.guard';
-import { GoogleLoginDto } from '../../dtos/auth/google-login.dto';
 
 @Controller('api/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('email-signup')
-  async emailSignup(@Body() emailSignupDto: EmailSignupDto) {
-    await this.authService.emailSignup(emailSignupDto);
+  @Post('signup')
+  async signup(@Body() signupDto: AccountDto) {
+    await this.authService.signup(signupDto);
     return new ApiResponse({
       status: HttpStatus.NO_CONTENT,
       message: '회원가입에 성공하였습니다.',
@@ -29,11 +28,11 @@ export class AuthController {
   }
 
   @Post('email-login')
-  async emailLogin(@Body() signInAuthReqDto: EmailLoginDto) {
+  async emailLogin(@Body() emailLoginDto: EmailLoginDto) {
     return new ApiResponse({
       status: HttpStatus.NO_CONTENT,
       message: '이메일 로그인에 성공하였습니다.',
-      data: await this.authService.emailLogin(signInAuthReqDto),
+      data: await this.authService.emailLogin(emailLoginDto),
     });
   }
 
@@ -45,11 +44,12 @@ export class AuthController {
 
   @Get('google-redirect')
   @UseGuards(GoogleOAuthGuard)
-  async googleLoginRedirect(@Req() emailSignupDto: EmailSignupDto) {
+  async googleLoginRedirect(@Req() req) {
+    const user: AccountDto = req.user;
     return new ApiResponse({
       status: HttpStatus.OK,
       message: '구글 로그인에 성공하였습니다.',
-      data: await this.authService.googleLogin(emailSignupDto),
+      data: await this.authService.googleLogin(user),
     });
   }
 }
