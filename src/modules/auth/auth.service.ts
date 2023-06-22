@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AccountRepository } from '../../repositories/account.repository';
-import { EmailSignupDto } from '../../dtos/auth/email-signup.dto';
+import { AccountDto } from '../../dtos/account-profile/account.dto';
 import { DataSource } from 'typeorm';
 import { AccountProfileRepository } from '../../repositories/account-profile.repository';
 import * as bcrypt from 'bcryptjs';
@@ -16,9 +16,16 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async emailSignup(emailSignupDto: EmailSignupDto) {
-    const { email, password, loginType } = emailSignupDto;
-    if (await this.accountRepository.isEmailExist(email)) {
+  // loginType
+  // 1. 이메일: 이메일 검사를 통해서 없으면 createAccount, 이미 있다면 throw Error
+  // 2. 그 외: 이메일 검사를 통해서 없으면 createAccount, 이미 있으면 pass
+  async signup(accountDto: AccountDto) {
+    const { email, password, loginType } = accountDto;
+
+    if (
+      loginType === 'Email' &&
+      (await this.accountRepository.isEmailExist(email))
+    ) {
       throw new HttpException('이미 등록된 이메일입니다.', HttpStatus.CONFLICT);
     }
 
@@ -28,11 +35,11 @@ export class AuthService {
       hashedPassword = await bcrypt.hash(password, salt);
     }
 
-    await this.accountRepository.createAccount(
-      email,
-      hashedPassword,
-      loginType,
-    );
+    // await this.accountRepository.createAccount(
+    //   email,
+    //   hashedPassword,
+    //   loginType,
+    // );
   }
 
   async emailLogin(emailLoginDto: EmailLoginDto) {
@@ -54,9 +61,7 @@ export class AuthService {
     };
   }
 
-  // TODO: 1. emailSignupDto 이름 바꾸기 (OAuth 들도 다 써야하므로 범용적으로)
-  // TODO: 2. 구글 로그인할 때, 회원가입도 잘 되는지 테스트하기
-  async googleLogin(emailSignupDto: EmailSignupDto) {
-    return await this.emailSignup(emailSignupDto);
+  async googleLogin(signupDto: AccountDto) {
+    return await this.signup(signupDto);
   }
 }
